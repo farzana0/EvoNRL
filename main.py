@@ -105,7 +105,7 @@ def edgeloops(g, walks, es):
 				g.add_edge(*edge[0], weight=1)
 			else:
 				g.remove_edge(*edge[0], weight=1)
-		step = step + 1
+		steps = steps + 1
  
 
 def main(args):
