@@ -99,7 +99,7 @@ def edgeloops(g, walks, es):
 	edges_evolve = chunks(edges_evolve, args.totalsteps) 
 	steps = 0
 	for chunk in edge_evolve:
-		lr, walks, keys = evonrl.main(g, walks, edges=chunk, es=es, wl=args.walk_length, ind=args.indexx, inputvec=args.vecinput, output=args.output + str(step))
+		lr, walks, keys = evonrl.main(g, walks, edges=chunk, es=es, wl=args.walk_length, ind=args.indexx, inputvec=args.vecinput, output=args.output + str(steps))
 		for edge in chunk:
 			if edge[1] == 'add':
 				g.add_edge(*edge[0], weight=1)
