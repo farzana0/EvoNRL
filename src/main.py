@@ -76,8 +76,6 @@ def graphs():
 		g0 = nx.read_edgelist(args.input, nodetype=int)
 	for edge in g0.edges():
 		g0[edge[0]][edge[1]]['weight'] = 1
-	for edge in g0.edges():
-		g0[edge[0]][edge[1]]['weight'] = 1
 	return g0
 
 def chunks(l, n):
@@ -88,7 +86,7 @@ def create_edgelist():
 	edges_evolve = []
 	with open(args.edges, 'r') as f:
 		for line in f:
-    		edges_evolve.append((line.split(',')[0], line.split(',')[1]), line.split(',')[2])
+    			edges_evolve.append((line.split(',')[0], line.split(',')[1]), line.split(',')[2])
     return edges_evolve
 
 
@@ -105,7 +103,7 @@ def edgeloops(g, walks, es):
 				g.add_edge(*edge[0], weight=1)
 			else:
 				g.remove_edge(*edge[0], weight=1)
-		step = step + 1
+		steps = steps + 1
  
 
 def main(args):
