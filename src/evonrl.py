@@ -274,7 +274,7 @@ def walks_update(G, num_walks, walklength, walks, es, edges, ind):
 			walks, G = addition(G, num_walks, walklength, walks, es, edge[0], ind)	
 		else:
 			walks, G = deletion(G, num_walks,  walklength, walks, es, edge[0], ind)
-	return walks_new
+	return walks
 
 		
 
