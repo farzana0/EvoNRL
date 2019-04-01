@@ -5,8 +5,11 @@ from gensim.models import Word2Vec
 import random
 from elasticsearch import Elasticsearch
 from elasticsearch import helpers
+import time
 import cPickle
 global args
+import time
+import copy
 
 
 class parse_args():
@@ -276,8 +279,8 @@ def walks_update(G, num_walks, walklength, walks, es, edges, ind):
 		
 
 
-def main(g, walks, es, edges,wl, ind, inputvec, output):
-	walks_new = walks_update(g, wl, walks, es, edges, ind)
+def main(g, walks, num_walks, es, edges,wl, ind, inputvec, output):
+	walks_new = walks_update(g, num_walks, wl, walks, es, edges, ind)
 	with open(output + 'walks.pkl', 'wb') as pf:
 			cPickle.dump(walks_new, pf)
 	lr, keys = learn_embeddings(walks_new, inputvec, output, edges)
