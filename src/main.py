@@ -87,7 +87,8 @@ def create_edgelist():
 	edges_evolve = []
 	with open(args.edges, 'r') as f:
 		for line in f:
-			edges_evolve.append(((line.split(',')[0], line.split(',')[1]), line.split(',')[2]))
+			line = line.rstrip('\n')
+			edges_evolve.append(((int(line.split(',')[0]), int(line.split(',')[1])), line.split(',')[2]))
 	return edges_evolve
 
 
@@ -98,13 +99,13 @@ def edgeloops(g, walks, es):
 	edges_evolve = chunks(edges_evolve, args.totalsteps) 
 	steps = 0
 	for chunk in edges_evolve:
-		lr, walks, keys = evonrl.main(g, walks, edges=chunk, es=es, wl=args.walk_length, ind=args.indexx, inputvec=args.vecinput, output=args.output + str(step))
+		lr, walks, keys = evonrl.main(g, walks, edges=chunk, es=es, wl=args.walk_length, ind=args.indexx, inputvec=args.vecinput, output=args.output + str(steps))
 		for edge in chunk:
 			if edge[1] == 'add':
 				g.add_edge(*edge[0], weight=1)
 			else:
 				g.remove_edge(*edge[0], weight=1)
-		step = step + 1
+		steps = steps + 1
  
 
 def main(args):

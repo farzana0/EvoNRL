@@ -285,6 +285,7 @@ def deletion(G, walklength, walks, es, i, ind):
 
 def walks_update(G, walklength, walks, es, edges, ind):
 	for edge in edges:
+		print edge[1]
 		if edge[1] == 'add':
 			walks, G = addition(G, walklength, walks, es, edge[0], ind)	
 		else:
