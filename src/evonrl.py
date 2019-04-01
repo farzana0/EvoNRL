@@ -5,11 +5,8 @@ from gensim.models import Word2Vec
 import random
 from elasticsearch import Elasticsearch
 from elasticsearch import helpers
-import time
 import cPickle
 global args
-import time
-import copy
 
 
 class parse_args():
