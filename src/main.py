@@ -4,7 +4,6 @@ import initialization
 import random
 from statistics import mean
 import cPickle
-import multilabelClassification 
 import csv
 import evonrl 
 import argparse
@@ -72,8 +71,10 @@ def parse_args():
 def graphs():
 	if args.csv:
 		g0 = nx.read_edgelist(args.input, delimiter=',', nodetype=int)
-	else
+	else:
 		g0 = nx.read_edgelist(args.input, nodetype=int)
+	for edge in g0.edges():
+		g0[edge[0]][edge[1]]['weight'] = 1
 	for edge in g0.edges():
 		g0[edge[0]][edge[1]]['weight'] = 1
 	return g0
@@ -86,8 +87,8 @@ def create_edgelist():
 	edges_evolve = []
 	with open(args.edges, 'r') as f:
 		for line in f:
-    			edges_evolve.append((line.split(',')[0], line.split(',')[1]), line.split(',')[2])
-    return edges_evolve
+			edges_evolve.append(((line.split(',')[0], line.split(',')[1]), line.split(',')[2]))
+	return edges_evolve
 
 
 def edgeloops(g, walks, es):
@@ -96,19 +97,19 @@ def edgeloops(g, walks, es):
 	edges_evolve = create_edgelist()
 	edges_evolve = chunks(edges_evolve, args.totalsteps) 
 	steps = 0
-	for chunk in edge_evolve:
+	for chunk in edges_evolve:
 		lr, walks, keys = evonrl.main(g, walks, edges=chunk, es=es, wl=args.walk_length, ind=args.indexx, inputvec=args.vecinput, output=args.output + str(step))
 		for edge in chunk:
 			if edge[1] == 'add':
 				g.add_edge(*edge[0], weight=1)
 			else:
 				g.remove_edge(*edge[0], weight=1)
-		steps = steps + 1
+		step = step + 1
  
 
 def main(args):
 	g = graphs()	
-	walks, es, vocab, keys = initialization.main(g, args.indexx , args.directed, args.num_walks, args.walk_length, args.vecinput, args.output, args.dimensions, args.window_size, args.workers, args.iter, args.simulatewalks, args.walkfile)
+	walks, es, vocab, keys = initialization.main(g, args.indexx , args.num_walks, args.walk_length, args.vecinput, args.output, args.dimensions, args.window_size, args.workers, args.iter, args.simulatewalks, args.walkfile)
 	walks = [map(str, walk) for walk in walks]
 	edgeloops(g, walks, es)
 

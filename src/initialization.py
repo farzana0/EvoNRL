@@ -7,17 +7,15 @@ from elasticsearch import helpers
 global args
 import random
 import cPickle
-from elasticsearch import Elasticsearch
-from elasticsearch import helpers
+
 
 class parse_args():
-	def __init__(self, input, output, walkfile, vecinput, directed , num_walks, walk_length):
+	def __init__(self, input, output, walkfile, vecinput , num_walks, walk_length):
 		self.weighted=False
 		self.input = input
 		self.output = output
 		self.walksile = walkfile
 		self.vecinput = vecinput
-		self.directed = directed = False
 		self.num_walks = num_walks
 		self.walk_length = walk_length
 
@@ -53,7 +51,7 @@ def build_random_walk_set(G, num_paths, path_length, alpha=0,
 
 	for cnt in range(num_paths):
 		rand.shuffle(nodes)
-		for node in nodes:s
+		for node in nodes:
 			walks.append(random_walk(G, path_length, rand=rand, alpha=alpha, start=node))
 	return walks
 
@@ -106,7 +104,6 @@ def learn_embeddings(walks, dimensions, window_size, workers, iteration, output,
 	Learn embeddings by optimizing the Skipgram objective using SGD.
 	'''
 	if simulatewalks:
-		print walks[0]
 		model = Word2Vec(walks, size=dimensions, window=window_size, min_count=0, sg=1, workers=workers, iter=iteration)
 		model.train(walks, total_examples=model.corpus_count, epochs=model.iter)
 		model.save(outputvec)
@@ -125,8 +122,7 @@ def learn_embeddings(walks, dimensions, window_size, workers, iteration, output,
 
 
 
-def main(g, indexx, directed, num_walks, walk_length, outputvec, output, dimensions, window_size, workers, iteration, simulatewalks, walkfile):
-	print simulatewalks
+def main(g, indexx, num_walks, walk_length, outputvec, output, dimensions, window_size, workers, iteration, simulatewalks, walkfile):
 	if simulatewalks:
 		walks = build_random_walk_set(g, num_walks, walk_length, alpha=0, rand=random.Random(0))
 		with open(walkfile, 'wb') as pf:
@@ -137,7 +133,6 @@ def main(g, indexx, directed, num_walks, walk_length, outputvec, output, dimensi
 		pf = open(walkfile, 'rb')
 		walks = cPickle.load(pf)
 		pf.close()
-	print len(walks)
 	walks = [map(str, walk) for walk in walks]
 	lr, keys = learn_embeddings(walks, dimensions, window_size, workers, iteration, output, outputvec, simulatewalks)
 	es_init = elastic_init(walks, indexx)

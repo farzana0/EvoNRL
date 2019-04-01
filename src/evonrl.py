@@ -64,29 +64,29 @@ def learn_embeddings(walks_new, inputvec, output, edges):
 def addition(G, walklength, walks, es, edge, ind):
 	items = []
 	G.add_edge(*edge, weight=1)
-		number_node_addition = G.number_of_nodes() - node_numbers_initial
-		print 'number of nodes added'
-		print number_node_addition
-		node_i = str(edge[0])
-		node_j = str(edge[1])
-		res_i = helpers.scan(client=es, query={"query": {"match_phrase": {"wlks": {"query": node_i}}}}, index = ind, size = 10000, scroll='1m')
-		res_i = list(res_i)
-		degree_i = G.degree(edge[0])
-		degree_j = G.degree(edge[1])
-		sampled_i = random.sample(res_i, int(len(res_i)/degree_i))
-		blk = []
-		i_changes =[]
-		j_changes = []
-		if len(sampled_i) > 0:
-			for itemed in sampled_i:
-				itemed_0 = int(itemed['_id'])
-				items.append(itemed_0)
-				sp_i.append(itemed_0)
-				itemed_1 = random.choice(es.termvectors(index=ind, doc_type='walk', id=itemed_0, field_statistics=False, term_statistics=False, offsets=False, positions=True, fields = ['wlks'])['term_vectors']['wlks']['terms'][node_i]['tokens'])['position']
-				itemed_1 = itemed_1 % 100
-				walks[itemed_0][itemed_1+1:] = random_walk(G, walklength-itemed_1-1, alpha=0, rand=random.Random(), start=edge[1])
-				i_changes.append((itemed_0, itemed_1))
-				action = {
+	number_node_addition = G.number_of_nodes() - node_numbers_initial
+	print 'number of nodes added'
+	print number_node_addition
+	node_i = str(edge[0])
+	node_j = str(edge[1])
+	res_i = helpers.scan(client=es, query={"query": {"match_phrase": {"wlks": {"query": node_i}}}}, index = ind, size = 10000, scroll='1m')
+	res_i = list(res_i)
+	degree_i = G.degree(edge[0])
+	degree_j = G.degree(edge[1])
+	sampled_i = random.sample(res_i, int(len(res_i)/degree_i))
+	blk = []
+	i_changes =[]
+	j_changes = []
+	if len(sampled_i) > 0:
+		for itemed in sampled_i:
+			itemed_0 = int(itemed['_id'])
+			items.append(itemed_0)
+			sp_i.append(itemed_0)
+			itemed_1 = random.choice(es.termvectors(index=ind, doc_type='walk', id=itemed_0, field_statistics=False, term_statistics=False, offsets=False, positions=True, fields = ['wlks'])['term_vectors']['wlks']['terms'][node_i]['tokens'])['position']
+			itemed_1 = itemed_1 % 100
+			walks[itemed_0][itemed_1+1:] = random_walk(G, walklength-itemed_1-1, alpha=0, rand=random.Random(), start=edge[1])
+			i_changes.append((itemed_0, itemed_1))
+			action = {
 							"_op_type": 'update',
 						 	"_index": ind,
 							"_type": "walk",
@@ -96,81 +96,76 @@ def addition(G, walklength, walks, es, edge, ind):
 												}
 										}
 		 							}
-		 		blk.append(action)
-			helpers.bulk(es, blk)
-			
-
-
-		es.indices.refresh(index=ind)
-		
-		res_j = helpers.scan(client=es, query={"query": {"match_phrase": {"wlks": {"query": node_j}}}}, index=ind,
-							 size=10000, scroll='1m')
-		res_j = list(res_j)
-		sampled_j = random.sample(res_j, int(len(res_j)/degree_j))
-		RW_changes.append(len(list(set(sp_i).union(set(sp_j)))))
-		blk=[]
-		if len(sampled_j)> 0:
-			for itemed in sampled_j:
-				itemed_0 = int(itemed['_id'])
-				sp_j.append(itemed_0)
-				itemed_1 = random.choice(es.termvectors(index=ind, doc_type='walk', id=itemed_0, field_statistics=False, term_statistics=False, offsets=False, positions=True, fields = ['wlks'])['term_vectors']['wlks']['terms'][node_j]['tokens'])['position']
-				itemed_1 = itemed_1 % 100
-				j_changes.append((itemed_0, itemed_1))
-				walks[itemed_0][itemed_1+1:] = random_walk(G, walklength-itemed_1-1, alpha=0, rand=random.Random(), start=edge[0])
-				action = {
-										"_op_type": 'update',
-							 			"_index": ind,
-										"_type": "walk",
-										"_id": int(itemed['_id']),
-										"_source": {"doc":{
-										"wlks": ' '.join((walks[itemed_0]))
-															}
+	 		blk.append(action)
+		helpers.bulk(es, blk)
+	es.indices.refresh(index=ind)
+	res_j = helpers.scan(client=es, query={"query": {"match_phrase": {"wlks": {"query": node_j}}}}, index=ind,
+						 size=10000, scroll='1m')
+	res_j = list(res_j)
+	sampled_j = random.sample(res_j, int(len(res_j)/degree_j))
+	RW_changes.append(len(list(set(sp_i).union(set(sp_j)))))
+	blk=[]
+	if len(sampled_j)> 0:
+		for itemed in sampled_j:
+			itemed_0 = int(itemed['_id'])
+			sp_j.append(itemed_0)
+			itemed_1 = random.choice(es.termvectors(index=ind, doc_type='walk', id=itemed_0, field_statistics=False, term_statistics=False, offsets=False, positions=True, fields = ['wlks'])['term_vectors']['wlks']['terms'][node_j]['tokens'])['position']
+			itemed_1 = itemed_1 % 100
+			j_changes.append((itemed_0, itemed_1))
+			walks[itemed_0][itemed_1+1:] = random_walk(G, walklength-itemed_1-1, alpha=0, rand=random.Random(), start=edge[0])
+			action = {
+									"_op_type": 'update',
+						 			"_index": ind,
+									"_type": "walk",
+									"_id": int(itemed['_id']),
+									"_source": {"doc":{
+									"wlks": ' '.join((walks[itemed_0]))															}
 													}
-			 									}
+			 								}
 							
-			 	blk.append(action)
-			helpers.bulk(es, blk)
-			node_changes.append(len(list((set(i_changes).union(set(j_changes))))))
+			blk.append(action)
+		helpers.bulk(es, blk)
+		node_changes.append(len(list((set(i_changes).union(set(j_changes))))))
 
-		blk = []
-		if len(res_i) == 0:
-			print 'node addition'
-			for kk in range(10):
-				random.seed(kk)
-				walks.append(random_walk(G, walklength, alpha=0, rand=random.Random(), start=edge[0]))
-				action = {
-										"_op_type": 'create',
-							 			"_index": ind,
-										"_type": "walk",
-										"_id": len(walks),
-										"_source": {"doc":{
-										"wlks": ' '.join((walks[-1]))
-															}
-													}
-			 									}
+	blk = []
+	if len(res_i) == 0:
+		print 'node addition'
+		for kk in range(10):
+			random.seed(kk)
+			walks.append(random_walk(G, walklength, alpha=0, rand=random.Random(), start=edge[0]))
+			action = {
+									"_op_type": 'create',
+						 			"_index": ind,
+									"_type": "walk",
+									"_id": len(walks),
+									"_source": {"doc":{
+									"wlks": ' '.join((walks[-1]))
+														}
+												}
+		 									}
 							
-			 	blk.append(action)
+		 	blk.append(action)
 
 				
-		if len(res_j) == 0:
-			print 'node addition'
-			for kk in range(10):
-				random.seed(kk)
-				walks.append(random_walk(G, walklength, alpha=0, rand=random.Random(), start=edge[1]))
-				action = {
-										"_op_type": 'create',
-							 			"_index": ind,
-										"_type": "walk",
-										"_id": len(walks),
-										"_source": {"doc":{
-										"wlks": ' '.join((walks[-1]))
-															}
-													}
-			 									}
-							
-			 	blk.append(action)
-		helpers.bulk(es, blk)
-		es.indices.refresh(index=ind)
+	if len(res_j) == 0:
+		print 'node addition'
+		for kk in range(10):
+			random.seed(kk)
+			walks.append(random_walk(G, walklength, alpha=0, rand=random.Random(), start=edge[1]))
+			action = {
+									"_op_type": 'create',
+						 			"_index": ind,
+									"_type": "walk",
+									"_id": len(walks),
+									"_source": {"doc":{
+									"wlks": ' '.join((walks[-1]))
+														}
+												}
+		 									}
+						
+		 	blk.append(action)
+	helpers.bulk(es, blk)
+	es.indices.refresh(index=ind)
 	print 'updated!'
 	return walks, G
 
@@ -201,8 +196,6 @@ def deletion(G, walklength, walks, es, i, ind):
 			helpers.bulk(es, blk)
 			es.indices.refresh(index=ind)
 			blk = []
-			#print 'delete'
-			#print itemed_0
 		elif degree_i == 0 & change !=0:
 			walks[itemed_0][(change):] = random_walk(G, walklength-change, alpha=0, rand=random.Random(), start=i[1])
 			action = {
