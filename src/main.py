@@ -70,14 +70,12 @@ def parse_args():
 
 def graphs():
 	if args.csv:
-		g0 = nx.read_edgelist(args.input, delimiter=',', nodetype=int)
+		g = nx.read_edgelist(args.input, delimiter=',', nodetype=int)
 	else:
-		g0 = nx.read_edgelist(args.input, nodetype=int)
-	for edge in g0.edges():
-		g0[edge[0]][edge[1]]['weight'] = 1
-	for edge in g0.edges():
-		g0[edge[0]][edge[1]]['weight'] = 1
-	return g0
+		g = nx.read_edgelist(args.input, nodetype=int)
+	for edge in g.edges():
+		g[edge[0]][edge[1]]['weight'] = 1
+	return g
 
 def chunks(l, n):
     for i in range(0, len(l), n):
@@ -93,13 +91,11 @@ def create_edgelist():
 
 
 def edgeloops(g, walks, es):
-	prec_node2vec = []
-	prec_node2vec_dyn = []
 	edges_evolve = create_edgelist()
 	edges_evolve = chunks(edges_evolve, args.totalsteps) 
 	steps = 0
 	for chunk in edges_evolve:
-		lr, walks, keys = evonrl.main(g, walks, edges=chunk, es=es, wl=args.walk_length, ind=args.indexx, inputvec=args.vecinput, output=args.output + str(steps))
+		lr, walks, keys = evonrl.main(g, walks, num_walks= args.num_walks, edges=chunk, es=es, wl=args.walk_length, ind=args.indexx, inputvec=args.vecinput, output=args.output + str(steps))
 		for edge in chunk:
 			if edge[1] == 'add':
 				g.add_edge(*edge[0], weight=1)
