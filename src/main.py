@@ -35,7 +35,7 @@ def parse_args():
 	                    help='Initialization of the Embeddings output path')
 
 	parser.add_argument('--walkfile', nargs='?', default='evonrlsw_walks_v0.pkl',
-	                    help='Initila walk file path if available')
+	                    help='Initial walk file path if available')
 
 	parser.add_argument('--simulatewalks', type=bool, default=False,
 	                    help='if true simulates new walks else reads the walkfile IN CASE of FALSE DO NOT INPUT' )
@@ -68,7 +68,12 @@ def parse_args():
 	                    help='number of totaledges added.')
 	return parser.parse_args()
 
+# function to read the graphs
 def graphs():
+	'''
+	This function reads the edgelist and creates the graph
+	return: networkx graph object
+	'''
 	if args.csv:
 		g = nx.read_edgelist(args.input, delimiter=',', nodetype=int)
 	else:
@@ -77,7 +82,12 @@ def graphs():
 		g[edge[0]][edge[1]]['weight'] = 1
 	return g
 
+# divides a list into smaller lists
 def chunks(l, n):
+	'''
+	This function starts from the begining and wraps every n consequetive\\
+	elements of l into a new list
+	'''
     for i in range(0, len(l), n):
         yield l[i:i + n]
 
